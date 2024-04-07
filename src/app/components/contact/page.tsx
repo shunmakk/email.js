@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import React from 'react'
+import React, { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import z from 'zod'
@@ -19,6 +19,8 @@ type formType = z.infer<typeof formShechma>
 
 
 const Contact = () => {
+
+  const [isSending,setIsSending] = useState(false);
 
   const form = useForm<formType>({
     resolver: zodResolver(formShechma),
@@ -39,6 +41,8 @@ const Contact = () => {
     const {name,email,content} = data
 
     if(userId && serviceId && templateId){
+      //送信処理開始
+      setIsSending(true);
 
       //email.jsを初期化
       init(userId)
@@ -47,11 +51,21 @@ const Contact = () => {
       const params = {
         name: name,
         email: email,
-        content: content
+        content: content,
+        from: 'お問い合わせフォームのフォーマット'
       }
+      try{  
+        await send(serviceId,templateId,params)
+      }
+      catch{
+        window.alert('送信に失敗しました。')
+      }
+      finally{
+        form.reset()
 
-      await send(serviceId,templateId,params)
-      form.reset()
+        //処理完了
+        setIsSending(false);
+      }
     }
   }
 
@@ -68,7 +82,7 @@ const Contact = () => {
               <FormItem>
                 <FormLabel>名前</FormLabel>
                 <FormControl>
-                  <Input placeholder='名前を入力'{...field} />
+                  <Input placeholder='名前を入力'{...field} disabled={isSending} />
                 </FormControl>
                 <FormDescription>名前を入力してください</FormDescription>
                 <FormMessage/>
@@ -82,7 +96,7 @@ const Contact = () => {
               <FormItem>
                 <FormLabel>メールアドレス</FormLabel>
                 <FormControl>
-                  <Input placeholder='exaple@yahoo.co.jp'{...field} />
+                  <Input placeholder='exaple@yahoo.co.jp'{...field} disabled={isSending} />
                 </FormControl>
                 <FormDescription>メールアドレスを入力してください</FormDescription>
                 <FormMessage/>
@@ -95,15 +109,15 @@ const Contact = () => {
              render={({field}) => (
               <FormItem>
                 <FormLabel>お問い合わせ内容</FormLabel>
-                <FormControl>
-                  <Textarea  placeholder='コールセンターのアドレスが知りたい'{...field} className='resize-none h-[200px]' />
+                <FormControl >
+                  <Textarea  placeholder='コールセンターのアドレスが知りたい'{...field} className='resize-none h-[200px]' disabled={isSending} />
                 </FormControl>
                 <FormDescription>お問い合わせ内容を入力してください</FormDescription>
                 <FormMessage/>
               </FormItem>
              )}
             />
-            <Button>送信</Button>
+            <Button disabled={isSending}>送信</Button>
           </form>
         </Form>
       </div>
