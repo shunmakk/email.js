@@ -8,6 +8,7 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import z from 'zod'
 import { Textarea } from '@/components/ui/textarea'
 import { init, send } from '@emailjs/browser'
+import toast, { Toaster } from 'react-hot-toast'
 
 const formShechma = z.object({
   name: z.string().min(4,{message:'4文字以上で入力してください'}).max(15, {message: '15文字以下で入力してください'}),
@@ -43,6 +44,7 @@ const Contact = () => {
     if(userId && serviceId && templateId){
       //送信処理開始
       setIsSending(true);
+      const loadingToast = toast.loading("送信中")
 
       //email.jsを初期化
       init(userId)
@@ -56,12 +58,14 @@ const Contact = () => {
       }
       try{  
         await send(serviceId,templateId,params)
+        toast.success('送信に成功しました')
       }
       catch{
-        window.alert('送信に失敗しました。')
+       toast.error('送信に失敗しました。')
       }
       finally{
         form.reset()
+        toast.dismiss(loadingToast)
 
         //処理完了
         setIsSending(false);
@@ -71,6 +75,7 @@ const Contact = () => {
 
   return (
     <div className='container h-screen flex items-center'>
+      <Toaster/>
       <div className='lg:w-[60%] w-full mx-auto '>
         <h2 className='text-[30px] md:text-[40px] font-bold mb-[30px]'>お問い合わせフォーム</h2>
         <Form {...form}>
