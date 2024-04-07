@@ -4,9 +4,10 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { zodResolver } from '@hookform/resolvers/zod'
 import React from 'react'
 import { Input } from '@/components/ui/input'
-import { useForm } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import z from 'zod'
 import { Textarea } from '@/components/ui/textarea'
+import { init, send } from '@emailjs/browser'
 
 const formShechma = z.object({
   name: z.string().min(4,{message:'4文字以上で入力してください'}).max(15, {message: '15文字以下で入力してください'}),
@@ -28,9 +29,30 @@ const Contact = () => {
     }
   })
 
-  const onSubmit = (data:formType) => {
-    console.log(data)
-    form.reset()
+  const onSubmit:SubmitHandler<formType> = async (data:formType) => {
+
+
+    const userId = process.env.NEXT_PUBLIC_USER_ID;
+    const serviceId = process.env.NEXT_PUBLIC_SERVICE_ID;
+    const templateId = process.env.NEXT_PUBLIC_TEMPLATE_ID;
+
+    const {name,email,content} = data
+
+    if(userId && serviceId && templateId){
+
+      //email.jsを初期化
+      init(userId)
+
+      //送信するデータを定義
+      const params = {
+        name: name,
+        email: email,
+        content: content
+      }
+
+      await send(serviceId,templateId,params)
+      form.reset()
+    }
   }
 
   return (
