@@ -11,7 +11,7 @@ import { init, send } from '@emailjs/browser'
 import toast, { Toaster } from 'react-hot-toast'
 
 const formShechma = z.object({
-  name: z.string().min(4,{message:'4文字以上で入力してください'}).max(15, {message: '15文字以下で入力してください'}),
+  name: z.string().min(2,{message:'1文字以上で入力してください'}).max(15, {message: '15文字以下で入力してください'}),
   email: z.string().email({message: 'メールアドレスの形式ではありません'}),
   content: z.string().min(1,{message: '1文字以上で入力してください'})
 })
@@ -87,7 +87,7 @@ const Contact = () => {
               <FormItem>
                 <FormLabel>名前</FormLabel>
                 <FormControl>
-                  <Input placeholder='名前を入力'{...field} disabled={isSending} />
+                  <Input placeholder='山田太郎'{...field} disabled={isSending} />
                 </FormControl>
                 <FormDescription>名前を入力してください</FormDescription>
                 <FormMessage/>
@@ -115,7 +115,7 @@ const Contact = () => {
               <FormItem>
                 <FormLabel>お問い合わせ内容</FormLabel>
                 <FormControl >
-                  <Textarea  placeholder='コールセンターのアドレスが知りたい'{...field} className='resize-none h-[200px]' disabled={isSending} />
+                  <Textarea  placeholder='お問い合わせ内容について入力'{...field} className='resize-none h-[200px]' disabled={isSending} />
                 </FormControl>
                 <FormDescription>お問い合わせ内容を入力してください</FormDescription>
                 <FormMessage/>
